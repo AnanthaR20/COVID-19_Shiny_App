@@ -30,7 +30,7 @@ cap <- fread("HealthCapacity.csv",fill = T)
 
 # US aggregate time series data on several variables
 usts <- fread("https://covidtracking.com/api/us/daily.csv") %>% 
-  select(-13,-14,-16:-25)
+  select(-13,-14,-16:-24)
 usts$date <- as.Date(sapply(as.character(usts$date),function(char){
   yr <- char %>% str_sub(1,4)
   m <- char %>% str_sub(5,6)
@@ -52,7 +52,7 @@ usts <- usts %>% mutate(incidence = positive-lead(positive),
 
 # States time series data on several variables
 stts <- fread("https://covidtracking.com/api/v1/states/daily.csv") %>% 
-  select(-13,-14,-16:-25)
+  select(-13,-14,-16:-24)
 stts$date <- as.Date(sapply(as.character(stts$date),function(char){
   yr <- char %>% str_sub(1,4)
   m <- char %>% str_sub(5,6)
