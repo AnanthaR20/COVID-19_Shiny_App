@@ -7,9 +7,6 @@
 # At the end of this script there are a couple of function associated
 #   with the way the data is structured to get useful info from it.
 
-
-source("C:/Users/XiyuY/Desktop/Xiyu's Folder/stat 479/library.R")
-
 world <- list()
 
 # Create
@@ -59,4 +56,4 @@ for(i in 1:length(world)){
 # ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: #
 # -- Functions for the 'heat' 'h' list -- #
 
-source("C:/Users/XiyuY/Desktop/Xiyu's Folder/stat 479/pipe1functions.R")
+source('pipe1functions.R')

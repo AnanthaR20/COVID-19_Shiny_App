@@ -1,6 +1,6 @@
 # Summary Tables #
-source("C:/Users/XiyuY/Desktop/Xiyu's Folder/stat 479/library.R")
-source("C:/Users/XiyuY/Desktop/Xiyu's Folder/stat 479/pipe1.R")
+source("library.R")
+source("pipe1.R")
 print("Running dataTables.R")
 #--Summary Tables--#
 # On Earth
