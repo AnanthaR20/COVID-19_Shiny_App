@@ -9,4 +9,7 @@ track2(plotState) %>% ggplot(aes(x=date,y=R0))+
   geom_line() +
   geom_vline(xintercept = 
             stay_home$date_StayHomeOrder_issued[stay_home$state == plotState],
-            color = 'red' )
+            color = 'red' ) +
+  labs(x = "Date", 
+       y = "Ratio of incidence today to yesterday",
+       title = "Examining the acceleration factor of infection in WI")

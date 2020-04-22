@@ -19,6 +19,8 @@ stay_home$date_StayHomeOrder_issued <- as.Date(stay_home$date_StayHomeOrder_issu
 #-------------------------------------------------------------#
 # ===3=== #
 #KFF data: https://www.kff.org/health-costs/issue-brief/state-data-and-policy-actions-to-address-coronavirus/
+# This is data about the health capacity, hospital beds, capacity per
+# 10,000 population etc. for each state and for the nation as a whole.
 cap <- fread("0)_setup/KFF/HealthCapacity.csv",fill = T)
 
 # pol <- fread("0)_setup/KFF/PublicPolicy.csv",fill = T)

@@ -1,0 +1,97 @@
+---
+title: "README: COVID-19 Analysis in the US"
+output: github_document
+---
+
+
+```{r include=FALSE}
+source("0)_setup/pipe3.R")
+```
+___
+
+
+*Visualization:*
+
+```{r echo = F}
+usts %>% ggplot(aes(x=date,y=positive))+
+  geom_line() + labs(y="# Confirmed Cases", title = "# Confirmed Cases of COVID-19 in the US")
+```
+
+
+*Our Claim: Social distancing is working to slow infection rates*
+-Vertical red line denotes the issue date of stay-home policy
+```{r echo=F,warning=F}
+plotState <- "Wisconsin"
+
+track2(plotState) %>% ggplot(aes(x=date,y=R0))+
+  geom_line() +
+  geom_vline(xintercept = 
+            stay_home$date_StayHomeOrder_issued[stay_home$state == plotState],
+            color = 'red' ) +
+  labs(x = "Date", y = "Ratio of incidence today to yesterday",title = "Examining the acceleration factor of infection in WI")
+#____________________________________________________#
+plotState <- "New York"
+
+track2(plotState) %>% ggplot(aes(x=date,y=R0))+
+  geom_line() +
+  geom_vline(xintercept = 
+            stay_home$date_StayHomeOrder_issued[stay_home$state == plotState],
+            color = 'red' ) +
+  labs(x = "Date", y = "Ratio of incidence today to yesterday",title = "Examining the acceleration factor of infection in NY")
+#____________________________________________________#
+plotState <- "Louisiana"
+
+track2(plotState) %>% ggplot(aes(x=date,y=R0))+
+  geom_line() +
+  geom_vline(xintercept = 
+            stay_home$date_StayHomeOrder_issued[stay_home$state == plotState],
+            color = 'red' ) +
+  labs(x = "Date", y = "Ratio of incidence today to yesterday",title = "Examining the acceleration factor of infection in Louisiana")
+```
+
+*Are we prepared for another spike?*
+-How much hospital capacity is available?
+The Curve for the US as a whole and for some states
+```{r, echo=FALSE, warning=F}
+usts %>% 
+  mutate(COVID_related_Hospitalization = (hospitalizedCurrently/`Total Hospital Beds`),
+         Available_Capacity = 1 - 0.5 - COVID_related_Hospitalization,
+         Other_Hospitalization = ifelse(date > "2020-03-21",0.5,NA)) %>% tp %>% 
+  filter(Rate_Type == 'COVID_related_Hospitalization'|Rate_Type == "Other_Hospitalization" | Rate_Type == 'Available_Capacity') %>%
+  ggplot(aes(x=date,y = value))+
+  geom_area(aes(fill = Rate_Type)) +
+  labs(y = "Proportion of Hospital Beds in Country",
+       title = "The Curve for the US")
+#______________________________________________________________#
+track2("NY") %>% select(-date_StayHomeOrder_issued) %>%  mutate(COVID_related_Hospitalization = (hospitalizedCurrently/`Total Hospital Beds`),
+         Available_Capacity = 1 - 0.5 - COVID_related_Hospitalization,
+         Other_Hospitalization = ifelse(date > "2020-03-25",0.5,NA)) %>% tp %>% 
+  filter(Rate_Type == 'COVID_related_Hospitalization'|Rate_Type == "Other_Hospitalization" | Rate_Type == 'Available_Capacity') %>%
+  ggplot(aes(x=date,y = value))+
+  geom_area(aes(fill = Rate_Type)) +
+  labs(y = "Proportion of Hospital Beds in State",
+       title = "The Curve for NY")
+#______________________________________________________________#
+track2("WI") %>% select(-date_StayHomeOrder_issued) %>%  mutate(COVID_related_Hospitalization = (hospitalizedCurrently/`Total Hospital Beds`),
+         Available_Capacity = 1 - 0.5 - COVID_related_Hospitalization,
+         Other_Hospitalization = ifelse(date > "2020-04-10",0.5,NA)) %>% tp %>% 
+  filter(Rate_Type == 'COVID_related_Hospitalization'|Rate_Type == "Other_Hospitalization" | Rate_Type == 'Available_Capacity') %>%
+  ggplot(aes(x=date,y = value))+
+  geom_area(aes(fill = Rate_Type)) +
+  labs(y = "Proportion of Hospital Beds in State",
+       title = "The Curve for WI")
+#______________________________________________________________#
+track2("CA") %>% select(-date_StayHomeOrder_issued) %>%  mutate(COVID_related_Hospitalization = (hospitalizedCurrently/`Total Hospital Beds`),
+         Available_Capacity = 1 - 0.5 - COVID_related_Hospitalization,
+         Other_Hospitalization = ifelse(date > "2020-03-26",0.5,NA)) %>% tp %>% 
+  filter(Rate_Type == 'COVID_related_Hospitalization'|Rate_Type == "Other_Hospitalization" | Rate_Type == 'Available_Capacity') %>%
+  ggplot(aes(x=date,y = value))+
+  geom_area(aes(fill = Rate_Type)) +
+  labs(y = "Proportion of Hospital Beds in State",
+       title = "The Curve for CA")
+
+
+
+
+```
+
