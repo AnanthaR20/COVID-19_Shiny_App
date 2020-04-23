@@ -7,10 +7,10 @@ library(stringr)
 
 # Run functions for pipe3 data
 
-source("C:/Users/XiyuY/Desktop/Xiyu's Folder/stat 479/pipe3functions.R")
+source("pipe3functions.R")
 
 #KFF data
-cap <- fread("C:/Users/XiyuY/Desktop/Xiyu's Folder/stat 479/HealthCapacity.csv",fill = T)
+cap <- fread("HealthCapacity.csv", fill = T)
 
 #pol <- fread("setup/KFF/PublicPolicy.csv",fill = T)
 
