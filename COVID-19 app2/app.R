@@ -16,7 +16,7 @@ source("pipe3.R")
 # Define UI ----
 ui <- navbarPage("Are We Beating COVID-19: Is social distancing working?",
                  theme = shinytheme("flatly"),
-                       
+#_______________________________________________________________________________________________#                       
 tabPanel("Visualization",
                                 
 hr(),
@@ -40,7 +40,7 @@ sidebarLayout(sidebarPanel(helpText("Choose a region and date to see the output 
                             sliderInput("date",
                                         label = "Dates",
                                         min = as.Date("2020-03-01","%Y-%m-%d"),
-                                        max = today()-1,
+                                        max = today(),
                                         value= today()-1,
                                         timeFormat="%Y-%m-%d")),
                                     
@@ -49,8 +49,7 @@ sidebarLayout(sidebarPanel(helpText("Choose a region and date to see the output 
                                       tabPanel("Cumulative", plotOutput("region_plot_cumulative")),
                                       tabPanel("Cumulative (log10)", plotOutput("region_plot_cumulative_log")))))),
                        
-                       
-                       
+#-------------------------------------------------------------------------------------------------#                       
 tabPanel("Our Claims",
         titlePanel("Is social distancing working?"),
         
@@ -80,19 +79,48 @@ tabPanel("Our Claims",
                              sliderInput("date2",
                                          label = "Dates",
                                          min = as.Date("2020-03-01","%Y-%m-%d"),
-                                         max = today()-1,
+                                         max = today(),
                                          value= today()-1,
                                          timeFormat="%Y-%m-%d")),
                          
                          mainPanel(plotOutput("total_vs_new_plot")))),
-                
-                tabPanel("R_0 Graph", 
+#_______________________________________________________________________________________________#
+            tabPanel("R_0 Graph", 
                      
                      hr(),
                      
                      sidebarLayout(
                          sidebarPanel(
                              selectInput("region3", 
+                                         label = "Choose a region to display",
+                                         choices = c("US","Alabama", "Alaska", "Arizona", "Arkansas", "California",
+                                                     "Colorado", "Connecticut", "Delaware", "Florida", "Georgia",      
+                                                     "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa",         
+                                                     "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland",      
+                                                     "Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri",     
+                                                     "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey", 
+                                                     "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio",         
+                                                     "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina",
+                                                     "South Dakota", "Tennessee", "Texas", "Utah", "Vermont", 
+                                                     "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming"),
+                                         selected = "Wisconsin"),
+                             
+                             sliderInput(inputId = "dateR0",
+                                         label = "Selected a date range:",
+                                         min = as.Date("2020-03-01"),
+                                         max = today(),
+                                         value= today()-1,
+                                         timeFormat="%Y-%m-%d")),
+                     
+                     mainPanel(plotOutput("r0_plot")))),
+#_______________________________________________________________________________________________#
+            tabPanel("Shift in Doubling Rate", 
+                     
+                     hr(),
+                     
+                     sidebarLayout(
+                         sidebarPanel(
+                             selectInput("region4", 
                                          label = "Choose a region to display",
                                          choices = c("Alabama", "Alaska", "Arizona", "Arkansas", "California",
                                                      "Colorado", "Connecticut", "Delaware", "Florida", "Georgia",      
@@ -104,42 +132,19 @@ tabPanel("Our Claims",
                                                      "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina",
                                                      "South Dakota", "Tennessee", "Texas", "Utah", "Vermont", 
                                                      "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming"),
-                                         selected = "Wisconsin")),
-                     
-                     mainPanel(plotOutput("r0_plot")))),
-                
-                tabPanel("Doubling Rate", 
-                     
-                     hr(),
-                     
-                     sidebarLayout(
-                         sidebarPanel(
-                             selectInput("region4", 
-                                         label = "Choose a region to display",
-                                         choices = c("US", 
-                                                     "Alabama", "Alaska", "Arizona", "Arkansas", "California",
-                                                     "Colorado", "Connecticut", "Delaware", "Florida", "Georgia",      
-                                                     "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa",         
-                                                     "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland",      
-                                                     "Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri",     
-                                                     "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey", 
-                                                     "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio",         
-                                                     "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina",
-                                                     "South Dakota", "Tennessee", "Texas", "Utah", "Vermont", 
-                                                     "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming"),
                                          selected = "US")),
-                         mainPanel(plotOutput("doubling_rate_table")))),
-                
-                
-                    tabPanel("Changes of Slope", 
+                         mainPanel(tableOutput("doubling_rate_table")))),
+#_______________________________________________________________________________________________#
+            tabPanel("Changes of Slope", 
                      
                      hr(),
                      
                      plotOutput("slope_plot")))),
                        
                        
-                       
-                       tabPanel("About",)
+#_______________________________________________________________________________________________#
+            tabPanel("About",)
+
                        
 )
 
@@ -148,67 +153,15 @@ tabPanel("Our Claims",
 server <- function(input, output) {
     
     output$region_plot <- renderPlot({
+        data <- NULL
+        if(input$region == "US"){ data <- usts }
+        else { data <- track2(input$region) }
         
-        data <- switch(input$region, 
-                       "US" = usts,
-                       "Alabama" = track2("Alabama"),
-                       "Alaska" = track2("Alaska"),
-                       "Arizona" = track2('Arizona'),
-                       "Arkansas" = track2('Arkansas'),
-                       "California" = track2('California'),
-                       "Colorado" = track2('Colorado'),
-                       "Connecticut" = track2('Connecticut'),
-                       "Delaware" = track2('Delaware'),
-                       "Florida" = track2('Florida'),
-                       "Georgia" = track2('Georgia'),
-                       "Hawaii" = track2('Hawaii'),
-                       "Idaho" = track2('Idaho'),
-                       "Illinois" = track2('Illinois'),
-                       "Indiana" = track2('Indiana'),
-                       "Iowa" = track2('Iowa'),
-                       "Kansas" = track2('Kansas'),
-                       "Kentucky" = track2('Kentucky'),
-                       "Louisiana" = track2('Louisiana'),
-                       "Maine" = track2('Maine'),
-                       "Maryland" = track2('Maryland'),
-                       "Massachusetts" = track2('Massachusetts'),
-                       "Michigan" = track2('Michigan'),
-                       "Minnesota" = track2('Minnesota'),
-                       "Mississippi" = track2('Mississippi'),
-                       "Missouri" = track2('Missouri'),
-                       "Montana" = track2('Montana'),
-                       "Nebraska" = track2('Nebraska'),
-                       "Nevada" = track2('Nevada'),
-                       "New Hampshire" = track2('New Hampshire'),
-                       "New Jersey" = track2('New Jersey'),
-                       "New Mexico" = track2('New Mexico'),
-                       "New York" = track2('New York'),
-                       "North Carolina" = track2('North Carolina'),
-                       "North Dakota" = track2('North Dakota'),
-                       "Ohio" = track2('Ohio'),
-                       "Oklahoma" = track2('Oklahoma'),
-                       "Oregon" = track2('Oregon'),
-                       "Pennsylvania" = track2('Pennsylvania'),
-                       "Rhode Island" = track2('Rhode Island'),
-                       "South Carolina" = track2('South Carolina'),
-                       "South Dakota" = track2('South Dakota'),
-                       "Tennessee" = track2('Tennessee'),
-                       "Texas" = track2('Texas'),
-                       "Utah" = track2('Utah'),
-                       "Vermont" = track2('Vermont'),
-                       "Virginia" = track2('Virginia'),
-                       "Washington" = track2('Washington'),
-                       "West Virginia" = track2('West Virginia'),
-                       "Wisconsin" = track2('Wisconsin'),
-                       "Wyoming" = track2('Wyoming'))
-        
-        data <- as_tibble(data)
         date_input <- input$date
         
         data.frame(data) %>% 
             filter(date <= date_input) %>%
-            mutate(new_daily = (positive - lead(positive, n=1))) %>% 
-            ggplot(aes(x = date, y = new_daily)) + 
+            ggplot(aes(x = date, y = incidence)) + 
             geom_area(fill = "#69b3a2", alpha=0.5) +
             geom_line(colour="#69b3a2") +
             theme_ipsum() +
@@ -216,63 +169,12 @@ server <- function(input, output) {
                  y = "New cases (daily)")
         
     })
-    
+#_______________________________________________________________________________________________#
     output$region_plot_cumulative <- renderPlot({
+        data <- NULL
+        if(input$region == "US"){ data <- usts }
+        else { data <- track2(input$region) }
         
-        data <- switch(input$region, 
-                       "US" = usts,
-                       "Alabama" = track2("Alabama"),
-                       "Alaska" = track2("Alaska"),
-                       "Arizona" = track2('Arizona'),
-                       "Arkansas" = track2('Arkansas'),
-                       "California" = track2('California'),
-                       "Colorado" = track2('Colorado'),
-                       "Connecticut" = track2('Connecticut'),
-                       "Delaware" = track2('Delaware'),
-                       "Florida" = track2('Florida'),
-                       "Georgia" = track2('Georgia'),
-                       "Hawaii" = track2('Hawaii'),
-                       "Idaho" = track2('Idaho'),
-                       "Illinois" = track2('Illinois'),
-                       "Indiana" = track2('Indiana'),
-                       "Iowa" = track2('Iowa'),
-                       "Kansas" = track2('Kansas'),
-                       "Kentucky" = track2('Kentucky'),
-                       "Louisiana" = track2('Louisiana'),
-                       "Maine" = track2('Maine'),
-                       "Maryland" = track2('Maryland'),
-                       "Massachusetts" = track2('Massachusetts'),
-                       "Michigan" = track2('Michigan'),
-                       "Minnesota" = track2('Minnesota'),
-                       "Mississippi" = track2('Mississippi'),
-                       "Missouri" = track2('Missouri'),
-                       "Montana" = track2('Montana'),
-                       "Nebraska" = track2('Nebraska'),
-                       "Nevada" = track2('Nevada'),
-                       "New Hampshire" = track2('New Hampshire'),
-                       "New Jersey" = track2('New Jersey'),
-                       "New Mexico" = track2('New Mexico'),
-                       "New York" = track2('New York'),
-                       "North Carolina" = track2('North Carolina'),
-                       "North Dakota" = track2('North Dakota'),
-                       "Ohio" = track2('Ohio'),
-                       "Oklahoma" = track2('Oklahoma'),
-                       "Oregon" = track2('Oregon'),
-                       "Pennsylvania" = track2('Pennsylvania'),
-                       "Rhode Island" = track2('Rhode Island'),
-                       "South Carolina" = track2('South Carolina'),
-                       "South Dakota" = track2('South Dakota'),
-                       "Tennessee" = track2('Tennessee'),
-                       "Texas" = track2('Texas'),
-                       "Utah" = track2('Utah'),
-                       "Vermont" = track2('Vermont'),
-                       "Virginia" = track2('Virginia'),
-                       "Washington" = track2('Washington'),
-                       "West Virginia" = track2('West Virginia'),
-                       "Wisconsin" = track2('Wisconsin'),
-                       "Wyoming" = track2('Wyoming'))
-        
-        data <- as_tibble(data)
         date_input <- input$date
         
         data %>% 
@@ -285,63 +187,12 @@ server <- function(input, output) {
                  x = "Date",
                  y = "Confirmed cases")
     })
-    
+#_______________________________________________________________________________________________#   
     output$region_plot_cumulative_log <- renderPlot({
+        data <- NULL
+        if(input$region == "US"){ data <- usts }
+        else { data <- track2(input$region) }
         
-        data <- switch(input$region, 
-                       "US" = usts,
-                       "Alabama" = track2("Alabama"),
-                       "Alaska" = track2("Alaska"),
-                       "Arizona" = track2('Arizona'),
-                       "Arkansas" = track2('Arkansas'),
-                       "California" = track2('California'),
-                       "Colorado" = track2('Colorado'),
-                       "Connecticut" = track2('Connecticut'),
-                       "Delaware" = track2('Delaware'),
-                       "Florida" = track2('Florida'),
-                       "Georgia" = track2('Georgia'),
-                       "Hawaii" = track2('Hawaii'),
-                       "Idaho" = track2('Idaho'),
-                       "Illinois" = track2('Illinois'),
-                       "Indiana" = track2('Indiana'),
-                       "Iowa" = track2('Iowa'),
-                       "Kansas" = track2('Kansas'),
-                       "Kentucky" = track2('Kentucky'),
-                       "Louisiana" = track2('Louisiana'),
-                       "Maine" = track2('Maine'),
-                       "Maryland" = track2('Maryland'),
-                       "Massachusetts" = track2('Massachusetts'),
-                       "Michigan" = track2('Michigan'),
-                       "Minnesota" = track2('Minnesota'),
-                       "Mississippi" = track2('Mississippi'),
-                       "Missouri" = track2('Missouri'),
-                       "Montana" = track2('Montana'),
-                       "Nebraska" = track2('Nebraska'),
-                       "Nevada" = track2('Nevada'),
-                       "New Hampshire" = track2('New Hampshire'),
-                       "New Jersey" = track2('New Jersey'),
-                       "New Mexico" = track2('New Mexico'),
-                       "New York" = track2('New York'),
-                       "North Carolina" = track2('North Carolina'),
-                       "North Dakota" = track2('North Dakota'),
-                       "Ohio" = track2('Ohio'),
-                       "Oklahoma" = track2('Oklahoma'),
-                       "Oregon" = track2('Oregon'),
-                       "Pennsylvania" = track2('Pennsylvania'),
-                       "Rhode Island" = track2('Rhode Island'),
-                       "South Carolina" = track2('South Carolina'),
-                       "South Dakota" = track2('South Dakota'),
-                       "Tennessee" = track2('Tennessee'),
-                       "Texas" = track2('Texas'),
-                       "Utah" = track2('Utah'),
-                       "Vermont" = track2('Vermont'),
-                       "Virginia" = track2('Virginia'),
-                       "Washington" = track2('Washington'),
-                       "West Virginia" = track2('West Virginia'),
-                       "Wisconsin" = track2('Wisconsin'),
-                       "Wyoming" = track2('Wyoming'))
-        
-        data <- as_tibble(data)
         date_input <- input$date
         
         data %>% 
@@ -356,62 +207,12 @@ server <- function(input, output) {
                  x = "Date",
                  y = "Confirmed cases")
     })
-    
+#_______________________________________________________________________________________________#  
     output$total_vs_new_plot <- renderPlot({
-        data <- switch(input$region2, 
-                       "US" = usts,
-                       "Alabama" = track2("Alabama"),
-                       "Alaska" = track2("Alaska"),
-                       "Arizona" = track2('Arizona'),
-                       "Arkansas" = track2('Arkansas'),
-                       "California" = track2('California'),
-                       "Colorado" = track2('Colorado'),
-                       "Connecticut" = track2('Connecticut'),
-                       "Delaware" = track2('Delaware'),
-                       "Florida" = track2('Florida'),
-                       "Georgia" = track2('Georgia'),
-                       "Hawaii" = track2('Hawaii'),
-                       "Idaho" = track2('Idaho'),
-                       "Illinois" = track2('Illinois'),
-                       "Indiana" = track2('Indiana'),
-                       "Iowa" = track2('Iowa'),
-                       "Kansas" = track2('Kansas'),
-                       "Kentucky" = track2('Kentucky'),
-                       "Louisiana" = track2('Louisiana'),
-                       "Maine" = track2('Maine'),
-                       "Maryland" = track2('Maryland'),
-                       "Massachusetts" = track2('Massachusetts'),
-                       "Michigan" = track2('Michigan'),
-                       "Minnesota" = track2('Minnesota'),
-                       "Mississippi" = track2('Mississippi'),
-                       "Missouri" = track2('Missouri'),
-                       "Montana" = track2('Montana'),
-                       "Nebraska" = track2('Nebraska'),
-                       "Nevada" = track2('Nevada'),
-                       "New Hampshire" = track2('New Hampshire'),
-                       "New Jersey" = track2('New Jersey'),
-                       "New Mexico" = track2('New Mexico'),
-                       "New York" = track2('New York'),
-                       "North Carolina" = track2('North Carolina'),
-                       "North Dakota" = track2('North Dakota'),
-                       "Ohio" = track2('Ohio'),
-                       "Oklahoma" = track2('Oklahoma'),
-                       "Oregon" = track2('Oregon'),
-                       "Pennsylvania" = track2('Pennsylvania'),
-                       "Rhode Island" = track2('Rhode Island'),
-                       "South Carolina" = track2('South Carolina'),
-                       "South Dakota" = track2('South Dakota'),
-                       "Tennessee" = track2('Tennessee'),
-                       "Texas" = track2('Texas'),
-                       "Utah" = track2('Utah'),
-                       "Vermont" = track2('Vermont'),
-                       "Virginia" = track2('Virginia'),
-                       "Washington" = track2('Washington'),
-                       "West Virginia" = track2('West Virginia'),
-                       "Wisconsin" = track2('Wisconsin'),
-                       "Wyoming" = track2('Wyoming'))
-        
-        data <- as_tibble(data)
+        data <- NULL
+        if(input$region2 == "US"){ data <- usts }
+        else { data <- track2(input$region2) }
+    
         date_input <- input$date2
         
         data %>% 
@@ -430,63 +231,15 @@ server <- function(input, output) {
                  x = "Total confirmed cases",
                  y = "New confirmed cases (previous week)")
     })
-    
+#_______________________________________________________________________________________________#
     output$r0_plot <- renderPlot({
-        data <- switch(input$region3, 
-                       "Alabama" = track2("Alabama"),
-                       "Alaska" = track2("Alaska"),
-                       "Arizona" = track2('Arizona'),
-                       "Arkansas" = track2('Arkansas'),
-                       "California" = track2('California'),
-                       "Colorado" = track2('Colorado'),
-                       "Connecticut" = track2('Connecticut'),
-                       "Delaware" = track2('Delaware'),
-                       "Florida" = track2('Florida'),
-                       "Georgia" = track2('Georgia'),
-                       "Hawaii" = track2('Hawaii'),
-                       "Idaho" = track2('Idaho'),
-                       "Illinois" = track2('Illinois'),
-                       "Indiana" = track2('Indiana'),
-                       "Iowa" = track2('Iowa'),
-                       "Kansas" = track2('Kansas'),
-                       "Kentucky" = track2('Kentucky'),
-                       "Louisiana" = track2('Louisiana'),
-                       "Maine" = track2('Maine'),
-                       "Maryland" = track2('Maryland'),
-                       "Massachusetts" = track2('Massachusetts'),
-                       "Michigan" = track2('Michigan'),
-                       "Minnesota" = track2('Minnesota'),
-                       "Mississippi" = track2('Mississippi'),
-                       "Missouri" = track2('Missouri'),
-                       "Montana" = track2('Montana'),
-                       "Nebraska" = track2('Nebraska'),
-                       "Nevada" = track2('Nevada'),
-                       "New Hampshire" = track2('New Hampshire'),
-                       "New Jersey" = track2('New Jersey'),
-                       "New Mexico" = track2('New Mexico'),
-                       "New York" = track2('New York'),
-                       "North Carolina" = track2('North Carolina'),
-                       "North Dakota" = track2('North Dakota'),
-                       "Ohio" = track2('Ohio'),
-                       "Oklahoma" = track2('Oklahoma'),
-                       "Oregon" = track2('Oregon'),
-                       "Pennsylvania" = track2('Pennsylvania'),
-                       "Rhode Island" = track2('Rhode Island'),
-                       "South Carolina" = track2('South Carolina'),
-                       "South Dakota" = track2('South Dakota'),
-                       "Tennessee" = track2('Tennessee'),
-                       "Texas" = track2('Texas'),
-                       "Utah" = track2('Utah'),
-                       "Vermont" = track2('Vermont'),
-                       "Virginia" = track2('Virginia'),
-                       "Washington" = track2('Washington'),
-                       "West Virginia" = track2('West Virginia'),
-                       "Wisconsin" = track2('Wisconsin'),
-                       "Wyoming" = track2('Wyoming'))
+        data <- NULL
+        if(input$region3 == "US"){ data <- usts }
+        else { data <- track2(input$region3) }
         
         plotState <- input$region3
         
-        track2(plotState) %>% ggplot(aes(x=date,y=R0))+
+        data %>% filter(date <= input$dateR0)%>% ggplot(aes(x=date,y=R0))+
             geom_line(color="#56B4E9", size=1) +
             geom_point(size=2, color="#56B4E9")+
             geom_vline(xintercept = stay_home$date_StayHomeOrder_issued[stay_home$state == plotState],
@@ -496,7 +249,59 @@ server <- function(input, output) {
                  y = "Ratio of incidence today to yesterday",
                  title = "Examining the acceleration factor of infection")
     })
+#_______________________________________________________________________________________________#
+    output$doubling_rate_table <- renderTable({
+        data <- NULL
+        if(input$region4 == "US"){ data <- usts}
+        else { data <- track2(input$region4)}
+        
+        subtract <- yday(min(data[['date']]))
+        
+        day1 <- yday(min(data[['date']])) - subtract + 1
+        day2 <- yday(stay_home$date_StayHomeOrder_issued[stay_home$state == input$region4]) - subtract
+        day3 <- today() - subtract
+        
+        shift <- data.frame(Before_Stay_At_Home = rdouble2(data,day1,day2),
+                            After_Stay_At_Home = rdouble2(data,day2+1,day3))
+        shift
+    })    
+#_______________________________________________________________________________________________#
+    output$slope_plot <- renderPlot({
+        #Making Models
+        support <- 0:365
+        USpop <- rep(1000000,length(support))
+        
+        m <- lm(positive ~ day , data = usts)
+        m1 <- lm(positive ~ day, data = (usts %>% filter(date > today()-7)))
+        m2 <- lm(positive ~ day, data = (usts %>% filter(date > today()-14)))
+        m3 <- lm(positive ~ day, data = (usts %>% filter(date > today()-21)))
+        
+        f <- function(x){return(m$coefficients[[1]] + m$coefficients[[2]]*x)}
+        f1 <- function(x){return(m1$coefficients[[1]] + m1$coefficients[[2]]*x)}
+        f2 <- function(x){return(m2$coefficients[[1]] + m2$coefficients[[2]]*x)}
+        f3 <- function(x){return(m3$coefficients[[1]] + m3$coefficients[[2]]*x)}
+        
+        USpredictions <- data.frame(matrix(nrow = length(support),ncol = 6))
+        USpredictions[[1]] <- support
+        USpredictions[[2]] <- USpop
+        USpredictions[[3]] <- f(support)
+        USpredictions[[4]] <- f1(support)
+        USpredictions[[5]] <- f2(support)
+        USpredictions[[6]] <- f3(support)
+        USpredictions[[7]] <- as.Date("2020-02-28") + (support)
+        colnames(USpredictions) <- c("day","1 Million Cases","timeline","last1Week","last2Weeks","last3Weeks",'date')
+        USpredictions <- USpredictions %>% pivot_longer(cols = c("1 Million Cases","timeline","last1Week","last2Weeks","last3Weeks"),names_to = "model")
     
+        ################## Model prediciton for the US #################
+        ####################plots of models#################################
+        
+        USpredictions %>% ggplot(mapping = aes(x = date,color = model)) +
+            geom_line(mapping = aes(y = value)) + labs(x = "Date", y = "# Confirmed Cases",
+                                                       title = "Projected trajectory fit over data from specified ranges") +
+            xlim(as.Date("2020-03-01"),as.Date("2020-12-31"))
+    })
+    
+        
 }
 
 # Run the app ----

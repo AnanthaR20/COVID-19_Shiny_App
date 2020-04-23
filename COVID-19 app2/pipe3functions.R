@@ -41,6 +41,35 @@ tp <- function(df){
 }
 
 
+# a doubling rate calculator
+rdouble2 <- function(df,from =1,to = nrow(df)){
+  counts <- c()
+  for(i in 1:nrow(df)){
+    current <- rev(df[['positive']])[i]
+    nextVal <- rev(df[['positive']])[i+1]
+    count <- 0
+    while(T){
+      if(i+1+count > nrow(df)){
+        count <- NA
+        break;
+      } else if(nextVal < 2*current){
+        count <- count + 1
+        nextVal <- rev(df[['positive']])[i+1+count]
+      } else if(nextVal >= 2*current){
+        count <- count + 1
+        break;
+      } else {
+        break;
+      }
+    }
+    counts[i] <- count
+  }
+  
+  return(mean(counts[from:to],na.rm = T))
+  
+}
+
+
 
 # A quick function to show the latest stats for the country
 usnow <- function(){
