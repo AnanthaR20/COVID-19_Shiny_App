@@ -1,5 +1,5 @@
 # Making predictions for how many cases there are in the US
-source("C:/Users/XiyuY/Desktop/Xiyu's Folder/stat 479/pipe3.R")
+source("pipe3.R")
 
 # Libraries
 library(ggplot2)

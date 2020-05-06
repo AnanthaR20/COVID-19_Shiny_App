@@ -70,8 +70,8 @@ stts <- stts %>% left_join(stay_home[-1],by = c("state" = "abb"))
 #__________________________________________________
 
 # A data frame about testing in the US
-cdc <- fread("https://covidtracking.com/api/cdc/daily.csv") %>% 
-  mutate(cumulative = cumsum(dailyTotal)*(1-lag))
+#cdc <- fread("https://covidtracking.com/api/cdc/daily.csv") %>% 
+#  mutate(cumulative = cumsum(dailyTotal)*(1-lag))
 #-------------------------------------------------------------#
 #-------------------------------------------------------------#
 #-------------------------------------------------------------#
@@ -85,3 +85,35 @@ pipe3ran <- TRUE
 #Examine difference between this account and the john hopkins data
 # rev(filter(track("Wisconsin"),date >= "2020-03-04")[['confirms']]) - 
 #   (filter(stts,state =='WI')[['positive']]) -> a
+
+#Data for creating maps
+library(dplyr)
+library(ggplot2)
+
+state_current = read.csv("https://covidtracking.com/api/v1/states/current.csv", header=T)
+state_current <- state_current %>% select(state, positive, negative, death)
+
+state_latlon = read.table("https://people.sc.fsu.edu/~jburkardt/datasets/states/state_capitals_ll.txt", header=F)
+state_latlon <- state_latlon %>% 
+  rename(state = V1) %>% 
+  rename(Latitude = V2) %>% 
+  rename(Longitude = V3)
+
+state_capitals = read.table("https://people.sc.fsu.edu/~jburkardt/datasets/states/state_capitals_name.txt", header=F)
+state_capitals <- state_capitals %>% 
+  rename(state = V1) %>% 
+  rename(capitals = V2)
+
+state_names = read.csv("statelatlong.csv", header=T)
+state_names <- state_names %>% 
+  rename(state_abbr = State) %>% 
+  rename(state = City) %>% 
+  select(state_abbr, state)
+
+state_current <- state_current %>% 
+  left_join(state_latlon, by="state") %>% 
+  left_join(state_capitals, by="state") %>% 
+  filter(!is.na(Latitude)) %>% 
+  rename(state_abbr = state) %>% 
+  left_join(state_names, by="state_abbr") %>% 
+  select(state_abbr, state, capitals, everything())

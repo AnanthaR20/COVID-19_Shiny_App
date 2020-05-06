@@ -1,89 +1,80 @@
 ##### Shiny app for exploring whether we're beating COVID-19 #####
 
+# Working directory
+setwd("C:/Users/XiyuY/Desktop/Xiyu's Folder/stat 479/project/COVID-19 app2")
+
 # Load required packages
 require(shiny)
 require(dplyr)
 require(ggplot2)
 require(plotly)
-require(ggthemes) # not used for now
 require(hrbrthemes)
 require(shinythemes)
 require(scales)
+require(leaflet) # for creating map
+require(htmltools) # for creating map
 
 # Load data
 source("pipe3.R")
+
+# Suppress warnings
+options(warn=-1)
 
 # Define UI ----
 ui <- navbarPage("Are We Beating COVID-19: Is social distancing working?",
                  theme = shinytheme("flatly"),
 #_______________________________________________________________________________________________#                       
 tabPanel("Visualization",
-                                
-hr(),
-                                
-sidebarLayout(sidebarPanel(helpText("Choose a region and date to see the output plot."),
-                           selectInput("region", 
-                                       label = "Choose a region to display",
-                                       choices = c("US", 
-                                                   "Alabama", "Alaska", "Arizona", "Arkansas", "California",
-                                                   "Colorado", "Connecticut", "Delaware", "Florida", "Georgia",      
-                                                   "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa",         
-                                                   "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland",      
-                                                   "Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri",     
-                                                   "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey", 
-                                                   "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio",         
-                                                   "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina",
-                                                   "South Dakota", "Tennessee", "Texas", "Utah", "Vermont", 
-                                                   "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming"),
-                                                   selected = "US"),
-                                        
-                            sliderInput("date",
-                                        label = "Dates",
-                                        min = as.Date("2020-03-01","%Y-%m-%d"),
-                                        max = today(),
-                                        value= today()-1,
-                                        timeFormat="%Y-%m-%d")),
-                                    
-                mainPanel(titlePanel("Growth of COVID-19"),
-                          tabsetPanel(tabPanel("New", plotOutput("region_plot")),
-                                      tabPanel("Cumulative", plotOutput("region_plot_cumulative")),
-                                      tabPanel("Cumulative (log10)", plotOutput("region_plot_cumulative_log")))))),
+fluidPage(theme="simplex.min.css",
+tags$h3("Data visualization of the growth of COVID-19"),
+
+leafletOutput("mymap"),
+
+fluidRow(
+  column(4,
+         helpText("Choose a region, date or a plot to see the output result."),
+         selectInput("region", 
+                     label = "Choose a region",
+                     choices = c("US", 
+                                 "Alabama", "Alaska", "Arizona", "Arkansas", "California",
+                                 "Colorado", "Connecticut", "Delaware", "Florida", "Georgia",      
+                                 "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa",         
+                                 "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland",      
+                                 "Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri",     
+                                 "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey", 
+                                 "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio",         
+                                 "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina",
+                                 "South Dakota", "Tennessee", "Texas", "Utah", "Vermont", 
+                                 "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming"),
+                     selected = "US"),
+         
+         sliderInput("date",
+                     label = "Dates",
+                     min = as.Date("2020-03-01","%Y-%m-%d"),
+                     max = today(),
+                     value= today()-1,
+                     timeFormat="%Y-%m-%d"),
+         
+         selectInput("plot",
+                     label = "Choose a plot to display",
+                     choices = list("Daily New Cases" = 1, "Cumulative Cases" = 2,
+                                    "Cumulative Cases (log)" = 3, "Total vs. New Cases" = 4),
+                     selected = 1
+           
+         )
+  ),
+  column(8,
+         plotOutput("selectedplot", height = "350px")
+  )
+)
+)                            
+),
                        
 #-------------------------------------------------------------------------------------------------#                       
 tabPanel("Our Claims",
         titlePanel("Is social distancing working?"),
         
         tabsetPanel(
-            
-            tabPanel("Total vs. New (previous week)", 
-                                             
-            hr(),
-                                             
-            sidebarLayout(
-                         sidebarPanel(
-                             selectInput("region2", 
-                                         label = "Choose a region to display",
-                                         choices = c("US", 
-                                                     "Alabama", "Alaska", "Arizona", "Arkansas", "California",
-                                                     "Colorado", "Connecticut", "Delaware", "Florida", "Georgia",      
-                                                     "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa",         
-                                                     "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland",      
-                                                     "Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri",     
-                                                     "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey", 
-                                                     "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio",         
-                                                     "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina",
-                                                     "South Dakota", "Tennessee", "Texas", "Utah", "Vermont", 
-                                                     "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming"),
-                                         selected = "US"),
-                             
-                             sliderInput("date2",
-                                         label = "Dates",
-                                         min = as.Date("2020-03-01","%Y-%m-%d"),
-                                         max = today(),
-                                         value= today()-1,
-                                         timeFormat="%Y-%m-%d")),
-                         
-                         mainPanel(plotOutput("total_vs_new_plot")))),
 #_______________________________________________________________________________________________#
             tabPanel("R_0 Graph", 
                      
@@ -143,7 +134,17 @@ tabPanel("Our Claims",
                        
                        
 #_______________________________________________________________________________________________#
-            tabPanel("About",)
+            tabPanel("About",
+                     tags$br(),tags$h4("Thesis"), 
+                     "For this project, we are interested to see whether we are beating COVID-19 in the US. 
+                      Specifically, we focus on how social distancing policy influence COVID-19 in different states. 
+                      Our thesis statement is: social distancing policy successfully slow the spread of COVID-19. 
+                      This app serves two purpose: First, visualize the growth of COVID-19 in the US; Second, 
+                      evaluate our claims.",
+                     tags$br(),tags$h4("Data"),
+                     "Our data is collected and stored by The COVID Tracking Project. The data includes information about 
+                      the daily cumulative positive test results, the daily negative test results, total number of people 
+                      hospitalized, cumulative number of deaths, etc.",)
 
                        
 )
@@ -151,8 +152,48 @@ tabPanel("Our Claims",
 
 # Define server logic ----
 server <- function(input, output) {
+  output$mymap <- renderLeaflet({
     
-    output$region_plot <- renderPlot({
+    RegionName <- input$region
+    if(RegionName == "US"){
+      ViewLon = -98.5795
+      ViewLat = 39.8283
+      ViewZoom = 4
+    }else{
+      ViewLon = state_current[state_current$state==RegionName, "Longitude"][1]
+      ViewLat = state_current[state_current$state==RegionName, "Latitude"][1]
+      ViewZoom = 6
+    }
+    
+    leaflet(state_current) %>% 
+      addProviderTiles(providers$CartoDB.VoyagerNoLabels) %>% 
+      addProviderTiles(providers$Stamen.TonerLines,
+                       options = providerTileOptions(opacity = 0.35)) %>%
+      addProviderTiles(providers$Stamen.TonerLabels) %>% 
+      setView(lng = ViewLon, lat = ViewLat, zoom = ViewZoom) %>% 
+      addCircles(lng = ~Longitude, lat = ~Latitude, 
+                 stroke = FALSE,
+                 weight = 1,
+                 color = "#0066FF",
+                 radius = ~sqrt(negative)*350, 
+                 label = ~paste0("Total Negative Cases: ", negative)) %>% 
+      addCircles(lng = ~Longitude, lat = ~Latitude, 
+                 stroke = T,
+                 weight = 1, 
+                 color = "#FF0000",
+                 radius = ~sqrt(positive)*350, 
+                 label = ~paste0("Total Positive Cases: ", positive)) %>% 
+      addLegend("topright", 
+                colors= c("#0066FF", "#FF0000"), 
+                opacity = 0.35,
+                labels=c("Negative Cases", "Positive Cases"), 
+                title="Cumulative Cases")
+    
+  })
+#_______________________________________________________________________________________________#
+    output$selectedplot <- 
+      renderPlot({
+        if(input$plot == 1){
         data <- NULL
         if(input$region == "US"){ data <- usts }
         else { data <- track2(input$region) }
@@ -162,15 +203,15 @@ server <- function(input, output) {
         data.frame(data) %>% 
             filter(date <= date_input) %>%
             ggplot(aes(x = date, y = incidence)) + 
-            geom_area(fill = "#69b3a2", alpha=0.5) +
-            geom_line(colour="#69b3a2") +
+            geom_area(fill = "#FF3333", alpha=0.3) +
+            geom_line(colour="#FF3333") +
             theme_ipsum() +
             labs(x = "Date",
                  y = "New cases (daily)")
         
-    })
+    }
 #_______________________________________________________________________________________________#
-    output$region_plot_cumulative <- renderPlot({
+    else if(input$plot == 2){
         data <- NULL
         if(input$region == "US"){ data <- usts }
         else { data <- track2(input$region) }
@@ -186,9 +227,9 @@ server <- function(input, output) {
             labs(title = "Cumulative Cases over Time",
                  x = "Date",
                  y = "Confirmed cases")
-    })
+  }
 #_______________________________________________________________________________________________#   
-    output$region_plot_cumulative_log <- renderPlot({
+    else if(input$plot == 3){
         data <- NULL
         if(input$region == "US"){ data <- usts }
         else { data <- track2(input$region) }
@@ -206,14 +247,14 @@ server <- function(input, output) {
             labs(title = "Cumulative Cases over Time (Log Scale)",
                  x = "Date",
                  y = "Confirmed cases")
-    })
+      }
 #_______________________________________________________________________________________________#  
-    output$total_vs_new_plot <- renderPlot({
+    else {
         data <- NULL
-        if(input$region2 == "US"){ data <- usts }
-        else { data <- track2(input$region2) }
+        if(input$region == "US"){ data <- usts }
+        else { data <- track2(input$region) }
     
-        date_input <- input$date2
+        date_input <- input$date
         
         data %>% 
             filter(date <= date_input) %>%
@@ -230,7 +271,7 @@ server <- function(input, output) {
             labs(title = "Trajectory of Covid-19 confirmed cases",
                  x = "Total confirmed cases",
                  y = "New confirmed cases (previous week)")
-    })
+    }})
 #_______________________________________________________________________________________________#
     output$r0_plot <- renderPlot({
         data <- NULL
