@@ -140,6 +140,12 @@ tabPanel("Our Claims",
                     textOutput(outputId = 'summary2')))),
 #_______________________________________________________________________________________________#
             tabPanel("About",
+                     tags$br(),tags$h4("Background"),
+                     "In December 2019, a virus causing severe respiratory illness has been found in Wuhan, China. In 
+                     January 2020, World Health Organization (WHO) identified it as a new coronovirus and officially named it as 
+                     COVID-19. The virus was soon transmitted outside of China and spreaded around the world. There are new confirmed cases 
+                     death everyday. Until now, effective medicines and treatments combating against COVID-19 are still in the process of 
+                     development.",
                      tags$br(),tags$h4("Thesis"), 
                      "For this project, we are interested to see whether we are beating COVID-19 in the US. 
                       Specifically, we focus on how social distancing policy influence COVID-19 in different states. 
@@ -147,9 +153,19 @@ tabPanel("Our Claims",
                       This app serves two purpose: First, visualize the growth of COVID-19 in the US; Second, 
                       evaluate our claims.",
                      tags$br(),tags$h4("Data"),
-                     "Our data is collected and stored by The COVID Tracking Project. The data includes information about 
-                      the daily cumulative positive test results, the daily negative test results, total number of people 
-                      hospitalized, cumulative number of deaths, etc.",)
+                     "Our data is collected and stored by", tags$a(href="https://covidtracking.com/api", "The COVID Tracking Project. "), "We 
+                     have two variables of interests: the total cumulative positive test results and the total cumulative negative test results.",
+                     tags$br(),tags$h4("Code"),
+                     "Tool and other input data used to generate the shiny app are available on ", tags$a(href="https://github.com/VanR20/COVID-19_Shiny_App", "Github. "),
+                     tags$br(), tags$h4("Project Description"),
+                     tags$h5("Data Visualization"),
+                     "The map in the visualization shows the cumulative positive and negative cases per state. There are four different plots in the visualization 
+                     part, including the daily new confirmed cases, cumulative confirmed cases overtime, cumulative confirmed cases over time 
+                     (log scale), and total confirmed cases vs. new confirmed cases in the previous week. For the last plot, we're expecting to see 
+                     a sheer drop in the curve, which indicates that the growth of COVID-19 slows. An example can be seen in the total vs. new confirmed 
+                     cases plot of Hawaii.",
+                     tags$h5("Our Claims"),
+                     "", )
 
                        
 )
@@ -207,12 +223,18 @@ server <- function(input, output) {
         
         data.frame(data) %>% 
             filter(date <= date_input) %>%
+            mutate(daily_negative = negative - lead(negative, 1)) %>% 
             ggplot(aes(x = date, y = incidence)) + 
             geom_area(fill = "#FF3333", alpha=0.3) +
             geom_line(colour="#FF3333") +
+            geom_area(aes(x=date, y=daily_negative),fill = "cornflowerblue", alpha = 0.3) +
+            geom_line(aes(x=date, y=daily_negative), colour="cornflowerblue") +
+          scale_y_log10(breaks = trans_breaks("log10", function(x) 10^x),
+                        labels = trans_format("log10", math_format(10^.x))) +
             theme_ipsum() +
-            labs(x = "Date",
-                 y = "New cases (daily)")
+            labs(title = paste0("Daily Negative vs. Positive Cases in ", input$region),
+                 x = "Date",
+                 y = "New negative vs. positive cases (daily)")
         
     }
 #_______________________________________________________________________________________________#
@@ -229,7 +251,7 @@ server <- function(input, output) {
             geom_line(colour = "#E69F00") +
             geom_point(size=2, colour="#E69F00") +
             theme_ipsum() +
-            labs(title = "Cumulative Cases over Time",
+            labs(title = paste0("Cumulative Cases over Time in ", input$region),
                  x = "Date",
                  y = "Confirmed cases")
   }
@@ -249,7 +271,7 @@ server <- function(input, output) {
             scale_y_log10(breaks = trans_breaks("log10", function(x) 10^x),
                           labels = trans_format("log10", math_format(10^.x))) +
             theme_ipsum() +
-            labs(title = "Cumulative Cases over Time (Log Scale)",
+            labs(title = paste0("Cumulative Cases over Time in ", input$region, " (Log Scale)"),
                  x = "Date",
                  y = "Confirmed cases")
       }
@@ -273,7 +295,7 @@ server <- function(input, output) {
             scale_y_log10(breaks = trans_breaks("log10", function(x) 10^x),
                           labels = trans_format("log10", math_format(10^.x))) +
             theme_ipsum_es() +
-            labs(title = "Trajectory of Covid-19 confirmed cases",
+            labs(title = paste0("Trajectory of Covid-19 confirmed cases in ", input$region),
                  x = "Total confirmed cases",
                  y = "New confirmed cases (previous week)")
     }})
