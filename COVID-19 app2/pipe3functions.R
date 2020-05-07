@@ -70,6 +70,32 @@ rdouble2 <- function(df,from =1,to = nrow(df)){
 }
 
 
+# Generates a graph of the day-to-day incidence ratios for a given state
+# Also add a line in the graph for stay at home order date initiation
+gen_ratio_df <- function(st = NULL){
+  data <- NULL
+  if(is.null(st)){data <- usts} 
+  else{ data <- track2(st)}
+  
+  r0 <- ifelse(!is.finite(data$R0),NA,data$R0)
+  
+  ch <- c()
+  for(i in 1:(length(r0)-6)){
+    vec <- c(r0[i],r0[i+1],r0[i+2],r0[i+3],r0[i+4],r0[i+5],r0[i+6])
+    
+    ch <- c(ch,mean(vec,na.rm = T))
+  }
+  ch <- rev(ch)
+  ch <- ifelse(is.nan(ch),NA,ch)
+  
+  accompanyingDates <- as.Date("2020-01-01") + yday((min(data$date)+6)):yday(max(data$date)) - 1
+  
+  return((data.frame(date = accompanyingDates, r0 = ch)) %>% mutate(Decelerating = r0 < 1))
+}
+
+
+
+
 
 # A quick function to show the latest stats for the country
 usnow <- function(){

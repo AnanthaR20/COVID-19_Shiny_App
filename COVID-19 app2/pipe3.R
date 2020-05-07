@@ -8,6 +8,7 @@ source("library.R")
 # ===1=== #
 # Manually made key for US state names and abbreviatsions
 uskey <- read.csv("uskey.csv")
+uskey$state <- as.character(uskey$state)
 #-------------------------------------------------------------#
 # ===2=== #
 # https://www.cnn.com/2020/03/23/us/coronavirus-which-states-stay-at-home-order-trnd/index.html
