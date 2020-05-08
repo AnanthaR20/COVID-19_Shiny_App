@@ -174,7 +174,7 @@ tabPanel("Our Claims",
                      4-21 is the average of the ratios since 4-15. It is, in a sense, a moving average. We potted the data in this way, because it
                      smoothes out data reporting abnormalities and gives a better sense of when we're in a 'peak' by
                      providing a larger window.", 
-                     tags$h5("Doublint-Period Tables"),
+                     tags$h5("Doubling-Period Tables"),
                      "In the doubling tables, we have listed the average amount of days until the number of cases
                      doubles. In the states with NA, there has been no stay home order put in effect. As we can see these numbers
                      consistently declined for each week after the order was issued.", 
