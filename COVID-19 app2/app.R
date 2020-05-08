@@ -164,8 +164,31 @@ tabPanel("Our Claims",
                      (log scale), and total confirmed cases vs. new confirmed cases in the previous week. For the last plot, we're expecting to see 
                      a sheer drop in the curve, which indicates that the growth of COVID-19 slows. An example can be seen in the total vs. new confirmed 
                      cases plot of Hawaii.",
-                     tags$h5("Our Claims"),
-                     "", )
+                     tags$br(),tags$h4("Our Claims"),
+                     tags$h5("R0 plot"),
+                     "We define incidence as the number of new cases in a day. The R0 plot represents a ratio of incidence on
+                     day 'i' to day 'i-1'. In this sense it is analogous to an approximated second derivative of the number of positive cases.
+                     If the ratio is greater than 1 the number of cases is accelerating. If it is equal to 1 we may be at something of an inflection
+                     point. If the ratio is less than 1 the number of cases is decelerating. Each point in this graph represents the average of day-to-day
+                     ratios for the immediately preceding week. For example, the data point on 4-20 is the average of the ratios since 4-14. The data point at
+                     4-21 is the average of the ratios since 4-15. It is, in a sense, a moving average. We potted the data in this way, because it
+                     smoothes out data reporting abnormalities and gives a better sense of when we're in a 'peak' by
+                     providing a larger window.", 
+                     tags$h5("Doublint-Period Tables"),
+                     "In the doubling tables, we have listed the average amount of days until the number of cases
+                     doubles. In the states with NA, there has been no stay home order put in effect. As we can see these numbers
+                     consistently declined for each week after the order was issued.", 
+                     tags$h5("Slope Plot"),
+                     "The models fit here are between time and the total number of positive cases. For each line,
+                     it is fit to the most recent week-interval defined in the legend. With each succesive week, the slope of the line
+                     decreases;indicating a potential slowing of the growth of COVID-19.", 
+                     tags$h5("Population Plots"),
+                     "We define the 'time until peak', as being the number of days between the stay home order and the first
+                     week of r0 values less than 1 (the first week where number of cases are decelerating). Here, we have two plots: 
+                     one which makes a model between population and time until peak, and the other with a model between
+                     population density and time until peak. We see a significant correlation between population density
+                     and the time it takes a stay home order to take effect such that larger densities lead to longer lags until effect.", 
+                     )
 
                        
 )
