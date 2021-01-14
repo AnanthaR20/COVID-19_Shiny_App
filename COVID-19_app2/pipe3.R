@@ -4,26 +4,27 @@
 #-------------------------------------------------------------#
 #-------------------------------------------------------------#
 # ===0=== #
-source("COVID-19_app2/library.R")
+source("library.R")
+# source("COVID-19_app2/library.R")
 # ===1=== #
 # Manually made key for US state names and abbreviatsions
-# uskey <- read.csv("uskey.csv")
-uskey <- read.csv("COVID-19_app2/uskey.csv")
+uskey <- read.csv("uskey.csv")
+# uskey <- read.csv("COVID-19_app2/uskey.csv")
 uskey$state <- as.character(uskey$state)
 #-------------------------------------------------------------#
 # ===2=== #
 # https://www.cnn.com/2020/03/23/us/coronavirus-which-states-stay-at-home-order-trnd/index.html
 # Constructed a chart from 'investigative' scraping from CNN website
 # Data.frame created manually on 2020-04-21 at 7:30pm
-# stay_home <- read.csv("StayHomeIssueDates.csv")
-stay_home <- read.csv("COVID-19_app2/StayHomeIssueDates.csv")
+stay_home <- read.csv("StayHomeIssueDates.csv")
+# stay_home <- read.csv("COVID-19_app2/StayHomeIssueDates.csv")
 stay_home$state <- as.character(stay_home$state)
 stay_home$date_StayHomeOrder_issued <- as.Date(stay_home$date_StayHomeOrder_issued)
 #-------------------------------------------------------------#
 # ===3=== #
 #KFF data: https://www.kff.org/health-costs/issue-brief/state-data-and-policy-actions-to-address-coronavirus/
-# cap <- fread("HealthCapacity.csv",fill = T)
-cap <- fread("COVID-19_app2/HealthCapacity.csv",fill = T)
+cap <- fread("HealthCapacity.csv",fill = T)
+# cap <- fread("COVID-19_app2/HealthCapacity.csv",fill = T)
 
 # pol <- fread("PublicPolicy.csv",fill = T)
 #-------------------------------------------------------------#
@@ -81,8 +82,8 @@ stts <- stts %>% left_join(stay_home[-1],by = c("state" = "abb"))
 #-------------------------------------------------------------#
 # ===5=== #
 # Run functions for pipe3 data
-# source("pipe3functions.R")
-source("COVID-19_app2/pipe3functions.R")
+source("pipe3functions.R")
+# source("COVID-19_app2/pipe3functions.R")
 
 pipe3ran <- TRUE
 
@@ -108,7 +109,8 @@ state_capitals <- state_capitals %>%
   rename(state = V1) %>% 
   rename(capitals = V2)
 
-state_names = read.csv("COVID-19_app2/statelatlong.csv", header=T)
+# state_names = read.csv("COVID-19_app2/statelatlong.csv", header=T)
+state_names = read.csv("statelatlong.csv", header=T)
 state_names <- state_names %>% 
   rename(state_abbr = State) %>% 
   rename(state = City) %>% 

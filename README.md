@@ -3,6 +3,11 @@ README: COVID-19 Analysis in the US
 
 -----
 
+This project provides an interactive Rshiny app which can be used to
+understand simple statistics about the COVID-19 pandemic in the US. The
+code for this shiny app can be found by clicking here
+[COVID-19\_app2/app.R](COVID-19_app2/app.R).
+
 *Visualizations:*
 
 ![](README_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
