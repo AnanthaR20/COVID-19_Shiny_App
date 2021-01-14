@@ -1,4 +1,4 @@
-README: COVID-19 Analysis in the US
+README: COVID-19 App for casual Analysis in the US
 ================
 
 -----
